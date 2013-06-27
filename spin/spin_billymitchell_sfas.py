@@ -1,0 +1,30 @@
+#!/opt/env/haines/dataproc/bin/python
+"""Spin processing of raw data to monthly netCDF data files"""
+
+from raw2proc import *
+
+# raw2proc('manual', 'billymitchell', 'sfas', '2009_06')
+# raw2proc('manual', 'billymitchell', 'sfas', '2009_07')
+# raw2proc('manual', 'billymitchell', 'sfas', '2009_08')
+# raw2proc('manual', 'billymitchell', 'sfas', '2009_09')
+# raw2proc('manual', 'billymitchell', 'sfas', '2009_10')
+# raw2proc('manual', 'billymitchell', 'sfas', '2009_11')
+# raw2proc('manual', 'billymitchell', 'sfas', '2009_12')
+# raw2proc('manual', 'billymitchell', 'sfas', '2010_01')
+# raw2proc('manual', 'billymitchell', 'sfas', '2010_02')
+# raw2proc('manual', 'billymitchell', 'sfas', '2010_03')
+# raw2proc('manual', 'billymitchell', 'sfas', '2010_04')
+# raw2proc('manual', 'billymitchell', 'sfas', '2010_05')
+# raw2proc('manual', 'billymitchell', 'sfas', '2010_06')
+# raw2proc('manual', 'billymitchell', 'sfas', '2010_07')
+# raw2proc('manual', 'billymitchell', 'sfas', '2010_08')
+# raw2proc('manual', 'billymitchell', 'sfas', '2010_09')
+# raw2proc('manual', 'billymitchell', 'sfas', '2011_06')
+# raw2proc('manual', 'billymitchell', 'sfas', '2011_07')
+# raw2proc('manual', 'billymitchell', 'sfas', '2011_08')
+# raw2proc('manual', 'billymitchell', 'sfas', '2011_09')
+# raw2proc('manual', 'billymitchell', 'sfas', '2011_10')
+# raw2proc('manual', 'billymitchell', 'sfas', '2011_11')
+raw2proc('manual', 'billymitchell', 'sfas', '2011_12')
+raw2proc('manual', 'billymitchell', 'sfas', '2012_01')
+raw2proc('manual', 'billymitchell', 'sfas', '2012_02')
