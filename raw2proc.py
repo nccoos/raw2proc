@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Last modified:  Time-stamp: <2012-06-01 17:01:51 haines>
+# Last modified:  Time-stamp: <2014-02-04 12:50:54 haines>
 """Process raw data to monthly netCDF data files
 
 This module processes raw ascii- or binary-data from different NCCOOS

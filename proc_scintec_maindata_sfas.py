@@ -75,9 +75,9 @@ def parser(platform_info, sensor_info, lines):
                 theta  = math.pi * float(theta) / 180.0
                 radial = float(radial)
                 data['u'][profile_index][observation_index] = \
-                    radial * math.sin(theta)
+                    -radial * math.sin(theta)
                 data['v'][profile_index][observation_index] = \
-                    radial * math.cos(theta)
+                    -radial * math.cos(theta)
             
             for variable in profile.variables:
                if variable not in manual and \
@@ -153,7 +153,7 @@ def creator(platform_info, sensor_info, data):
                  'reference':'geographic coordinates',
                  'units': 'degrees_east',
                  'valid_range':(-180.,180.),
-                 'axis': 'Y',
+                 'axis': 'X',
                 },
         'z' : {'short_name': 'z',
                'long_name': 'Height',
@@ -167,16 +167,19 @@ def creator(platform_info, sensor_info, data):
         'u': {'short_name' : 'u',
               'long_name': 'East/West Component of Wind',
               'standard_name': 'eastward_wind',
+              'positive': 'to the east',
               'units': 'm s-1',
              },
         'v': {'short_name' : 'v',
               'long_name': 'North/South Component of Wind',
-              'standard_name': 'northward_wind',                          
+              'standard_name': 'northward_wind',
+              'positive': 'to the north',         
               'units': 'm s-1',
              },
         'w': {'short_name' : 'w',
               'long_name': 'Vertical Component of Wind',
-              'standard_name': 'upward_wind',                          
+              'standard_name': 'upward_wind',
+              'positive': 'from the surface',                          
               'units': 'm s-1',
              },
         'sigw': {'short_name' : 'sigw',

@@ -1,9 +1,13 @@
 platform_info = {
  	    'id' : 'b2',
- 	    'location' : 'Raleigh Bay, 17 nm South of Ocracoke, NC',
- 	    'lat' : 34.7824,   # degrees true (-) south, (+) north
- 	    'lon' : -75.9410,  # degrees true (-) west, (+) east
- 	    'mvar' : -10.4,    # degrees (-) west, (+) east
+ 	    # 'location' : 'Raleigh Bay, 17 nm South of Ocracoke, NC',
+ 	    # 'lat' : 34.7824,   # degrees true (-) south, (+) north
+ 	    # 'lon' : -75.9410,  # degrees true (-) west, (+) east
+ 	    # 'mvar' : -10.4,    # degrees (-) west, (+) east
+ 	    'location' : 'IMS, Morehead City, NC',
+ 	    'lat' : 34.7232,   # degrees true (-) south, (+) north
+ 	    'lon' : -75.7528,  # degrees true (-) west, (+) east
+ 	    'mvar' : -10.0,    # degrees (-) west, (+) east
             'altitude': 0.,   # (approx.) station altitude
             'altitude_units' : 'm',
             'altitude_reference' : 'sea_surface',
@@ -12,9 +16,9 @@ platform_info = {
             'mean_water_depth_time_period': 'Not determined',
  	    'institution' : 'nccoos',
  	    #
- 	    'config_start_date' : '2011-11-13 00:00:00',
- 	    'config_end_date' : '2012-04-03 20:00:00', # None or yyyy-mm-dd HH:MM:SS
- 	    'packages' : ('met', 'wind', 'ctd1', 'ctd2'),
+ 	    'config_start_date' : '2013-11-04 00:00:00',
+ 	    'config_end_date' : None, # None or yyyy-mm-dd HH:MM:SS
+ 	    'packages' : ('met', 'wind', 'ctd1', 'ctd2', 'comp', 'gps', 'sys'),
             # Required by CF
             'institution' : 'Unversity of North Carolina at Chapel Hill (UNC-CH)',
             'institution_url' : 'http://nccoos.org',
@@ -31,8 +35,8 @@ platform_info = {
             'references' : 'http://nccoos.org',
             'source': 'Buoy CR1000 Datalogger',
             # Needed for processing NDBC output
-            'ndbc_module' : 'ndbc_41yyy',
-            'ndbc_id': '41yyy',
+            'ndbc_module' : 'ndbc_41063',
+            'ndbc_id': '41063',
             'ndbc_dir' : '/seacoos/data/nccoos/latest_ndbc',
             'ndbc_missing' : -9999.0,
             # report data to NDBC closest to top of each hour +/- 6 min
@@ -90,10 +94,10 @@ sensor_info = {
              },
     'ctd1' : { 'id' : 'ctd1',
               'description' : 'Near-surface CTD Data each sample period',
-              'raw_dir' : '/seacoos/data/nccoos/level0/b2/ctd1/store/2011_11',
+              'raw_dir' : '/seacoos/data/nccoos/level0/b2/ctd1/',
               'raw_file_glob' : '*',
               'proc_dir' : '/seacoos/data/nccoos/level1/b2/ctd1/',
-              'process_module' : 'proc_sbe37_ctd',
+              'process_module' : 'proc_cr1000_ctd_v1',
               'utc_offset' : 0,  # hours offset to utc of sampling time
               'nominal_depth' : -2.0,  # meters 
               'depth_units' : 'm',
@@ -111,10 +115,10 @@ sensor_info = {
              },
     'ctd2' : { 'id' : 'ctd2',
                'description' : 'Mid-level CTD Data each sample period',
-              'raw_dir' : '/seacoos/data/nccoos/level0/b2/ctd2/store/2011_11',
+              'raw_dir' : '/seacoos/data/nccoos/level0/b2/ctd2/',
               'raw_file_glob' : '*',
               'proc_dir' : '/seacoos/data/nccoos/level1/b2/ctd2/',
-              'process_module' : 'proc_sbe37_ctd',
+              'process_module' : 'proc_cr1000_ctd_v1',
               'utc_offset' : 0,  # hours offset to utc of sampling time
               'nominal_depth' : -15.0,  # meters 
               'depth_units' : 'm',
@@ -128,5 +132,44 @@ sensor_info = {
               'ndbc_units' : ('m', 'degC', 'psu'), 
               'plot_module': 'plot_cr1000_ctd',
               'plot_names': ('timeseries',),
+             },
+    'comp' : { 'id' : 'comp',
+              'description' : 'Compass data averaged for one minute each sample period',
+              'raw_dir' : '/seacoos/data/nccoos/level0/b2/comp/',
+              'raw_file_glob' : '*.dat',
+              'proc_dir' : '/seacoos/data/nccoos/level1/b2/comp/',
+              'process_module' : 'proc_cr1000_comp',
+              'utc_offset' : 0,  # hours offset to utc of sampling time
+              'compass_height'   : 1.5,   # meters
+              'height_units' : 'm',
+              'height_reference' : 'sea_surface',
+              'source': 'Honeywell Digital Compass',
+              # 'plot_module': 'plot_cr1000_comp',
+              # 'plot_names': ('timeseries',),
+             },
+    'sys' : { 'id' : 'sys',
+              'description' : 'CR1000 System Data',
+              'raw_dir' : '/seacoos/data/nccoos/level0/b2/sys/',
+              'raw_file_glob' : '*.dat',
+              'proc_dir' : '/seacoos/data/nccoos/level1/b2/sys/',
+              'process_module' : 'proc_cr1000_sys',
+              'utc_offset' : 0,  # hours offset to utc of sampling time
+              'canister_height'   : 1.5,   # meters
+              'height_units' : 'm',
+              'height_reference' : 'sea_surface',
+              'source': 'CR1000 batt, canister temp, and leak detect',
+              # 'plot_module': 'plot_cr1000_sys',
+              # 'plot_names': ('timeseries',),
+             },
+    'gps' : { 'id' : 'gps',
+              'description' : 'CR1000 GPS Data',
+              'raw_dir' : '/seacoos/data/nccoos/level0/b2/gps/',
+              'raw_file_glob' : '*.dat',
+              'proc_dir' : '/seacoos/data/nccoos/level1/b2/gps/',
+              'process_module' : 'proc_cr1000_gps',
+              'utc_offset' : 0,  # hours offset to utc of sampling time
+              'source': 'Garmin HVS 19x GPS ',
+              # 'plot_module': 'plot_cr1000_gps',
+              # 'plot_names': ('timeseries',),
              },
     }

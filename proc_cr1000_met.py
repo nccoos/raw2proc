@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Last modified:  Time-stamp: <2012-06-28 15:45:31 haines>
+# Last modified:  Time-stamp: <2014-02-04 13:48:19 haines>
 """
 how to parse data, and assert what data and info goes into
 creating and updating monthly netcdf files
@@ -112,12 +112,13 @@ def parser(platform_info, sensor_info, lines):
         if len(csi)==11:
             # 
             # data['samplenum'][i] = csi[0] # sample number assigned by datalogger in table
-            data['air_press'][i] =  csi[1] # Heise Barometer (psi) to mbar
+            data['air_press'][i] =  csi[1] # Campbell Sci (Viasala) CS106 barometer (mbar)
+            # Before Jan 2012, Heise Barometer (psi) to mbar
             data['rh'][i] = csi[2] # relative humidity avg (60 samples for 1 min)
             data['rh_std'][i] = csi[3] # relative humidity std
             data['air_temp'][i] = csi[4] # air temperature avg (deg C)
             data['air_temp_std'][i] = csi[5] # air temperature std (deg C)
-            data['rain'][i] = csi[6]/100. # precip gauge cummulative (mm) 
+            data['rain'][i] = csi[6] # precip gauge cummulative (mm) 
             data['psp'][i] = csi[7] # PSP avg 
             data['psp_std'][i] = csi[8] # PSP std
             data['pir'][i] = csi[9] # PIR avg (W m-2)
@@ -130,11 +131,26 @@ def parser(platform_info, sensor_info, lines):
         # if re.search
     # for line
 
-    data['air_press'] = udconvert(data['air_press'], 'psi', 'mbar')[0]
+    # Specific to buoys using CR1000 in Fall of 2011
+    # prior to Jan 01, 2012, pressure sensor was a Heise with units psi
+    # afterwards, Campbell Sci CS106 in units mbar,
+    # also handle b1/b2 PSP data for each buoy
+    if data['dt'][0] < datetime(2012, 1, 1):
+        data['air_press'] = udconvert(data['air_press'], 'psi', 'mbar')[0]
+        data['rain'] = data['rain']/100 # precip gauge cummulative (mm)
+                    
+        # specific to buoy B1 and B2
+        if platform_info['id'] == 'b1':
+            data['psp'] = -1*data['psp']/1000
+            data['psp_std'] = -1*data['psp_std']/1000
+        if platform_info['id'] == 'b2':
+            data['psp'] = numpy.nan*data['psp']
+            data['psp_std'] = numpy.nan*data['psp_std']
+    
     # some QC
     # good = -40<at & at<60 # does not work
     # good = (-40<at) & (at<60) # THIS WORKS!
-    good = (5<data['air_temp']) & (data['air_temp']<30)
+    good = (-40<data['air_temp']) & (data['air_temp']<60)
     bad = ~good
     data['air_temp'][bad] = numpy.nan 
     data['air_temp_std'][bad] = numpy.nan 
@@ -142,14 +158,11 @@ def parser(platform_info, sensor_info, lines):
     data['rh_std'][bad] = numpy.nan 
     data['rain'][bad] = numpy.nan 
 
-    # specific to buoy B1 and B2
-    if platform_info['id'] == 'b1':
-        data['psp'] = -1*data['psp']/1000
-        data['psp_std'] = -1*data['psp_std']/1000
-    if platform_info['id'] == 'b2':
-        data['psp'] = numpy.nan*data['psp']
-        data['psp_std'] = numpy.nan*data['psp_std']
-    
+    good = (-10<data['rh']) & (data['rh']<120)
+    bad = ~good
+    data['rh'][bad] = numpy.nan 
+    data['rh_std'][bad] = numpy.nan 
+
     # check that no data[dt] is set to Nan or anything but datetime
     # keep only data that has a resolved datetime
     keep = numpy.array([type(datetime(1970,1,1)) == type(dt) for dt in data['dt'][:]])

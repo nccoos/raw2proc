@@ -1,15 +1,16 @@
 #!/usr/bin/env python
-# Last modified:  Time-stamp: <2014-01-09 15:04:53 haines>
+# Last modified:  Time-stamp: <2014-02-04 15:05:55 haines>
 """
 how to parse data, and assert what data and info goes into
 creating and updating monthly netcdf files
 
-parse data met data collected on Campbell Scientific DataLogger (loggernet) (csi)
+parse data compass data collected on Campbell Scientific DataLogger (loggernet) (csi)
 
 parser : sample date and time, 
 
 creator : lat, lon, z, time, 
 updator : time, 
+
 
 Examples
 --------
@@ -36,16 +37,18 @@ now_dt.replace(microsecond=0)
 
 def parser(platform_info, sensor_info, lines):
     """
-    "TOA5","CR1000_B1","CR1000","37541","CR1000.Std.21","CPU:NCWIND_12_Buoy_All.CR1","58723","CTD1_6Min"
-    "TIMESTAMP","RECORD","ID","Temp","Cond","Depth","SampleDate","SampleTime","SampleNum"
-    "TS","RN","","","","","","",""
-    "","","Smp","Smp","Smp","Smp","Smp","Smp","Smp"
-    "2011-12-01 00:02:09",4449,3585,16.1596,4.15704,3.413," 30 Nov 2011"," 23:58:44","   4406 "
-    "2011-12-01 00:08:09",4450,3585,16.1783,4.15878,3.745," 01 Dec 2011"," 00:04:44","   4407 "
-    "2011-12-01 00:14:09",4451,3585,16.1638,4.15794,3.545," 01 Dec 2011"," 00:10:44","   4408 "
-    "2011-12-01 00:20:09",4452,3585,16.1632,4.15769,3.254," 01 Dec 2011"," 00:16:44","   4409 "
-    "2011-12-01 00:26:09",4453,3585,16.1524,4.15665,3.649," 01 Dec 2011"," 00:22:44","   4410 "
-    "2011-12-01 00:32:09",4454,3585,16.1661,4.1582,3.277," 01 Dec 2011"," 00:28:44","   4411 "
+    Example compass data
+
+    "TOA5","CR1000_B2","CR1000","31722","CR1000.Std.26","CPU:UNC CHill_20_Buoy2_Revision2013_str.CR1","36098","Comp_6Min"
+    "TIMESTAMP","RECORD","Heading_Avg","Heading_Std","PITCH_Avg","PITCH_Std","PITCH_Max","ROLL_Avg","ROLL_Std","ROLL_Max"
+    "TS","RN","","Deg","","","","","",""
+    "","","WVc","WVc","Avg","Std","Max","Avg","Std","Max"
+    "2014-02-01 00:00:59",593,14.37,0.242,1.01,0.03,1.1,0.227,0.051,0.4
+    "2014-02-01 00:06:59",594,14.32,0.258,1.01,0.03,1.1,0.227,0.044,0.3
+    "2014-02-01 00:12:59",595,14.22,0.088,1.017,0.037,1.1,0.217,0.037,0.3
+    "2014-02-01 00:24:59",596,14.24,0.095,1,0.018,1.1,0.232,0.047,0.3
+    "2014-02-01 00:30:59",597,14.18,0.108,1.007,0.025,1.1,0.223,0.042,0.3
+    
     """
 
     import numpy
@@ -63,12 +66,14 @@ def parser(platform_info, sensor_info, lines):
     data = {
         'dt' : numpy.array(numpy.ones((N,), dtype=object)*numpy.nan),
         'time' : numpy.array(numpy.ones((N,), dtype=long)*numpy.nan),
-        'wtemp' : numpy.array(numpy.ones((N,), dtype=float)*numpy.nan),
-        'cond' : numpy.array(numpy.ones((N,), dtype=float)*numpy.nan),
-        'press' : numpy.array(numpy.ones((N,), dtype=float)*numpy.nan),
-        'salin' : numpy.array(numpy.ones((N,), dtype=float)*numpy.nan),
-        'density' : numpy.array(numpy.ones((N,), dtype=float)*numpy.nan),
-        'depth' : numpy.array(numpy.ones((N,), dtype=float)*numpy.nan),
+        'hdg' : numpy.array(numpy.ones((N,), dtype=float)*numpy.nan),
+        'hdg_std' : numpy.array(numpy.ones((N,), dtype=float)*numpy.nan),
+        'pitch' : numpy.array(numpy.ones((N,), dtype=float)*numpy.nan),
+        'pitch_std' : numpy.array(numpy.ones((N,), dtype=float)*numpy.nan),
+        'pitch_max' : numpy.array(numpy.ones((N,), dtype=float)*numpy.nan),
+        'roll' : numpy.array(numpy.ones((N,), dtype=float)*numpy.nan),
+        'roll_std' : numpy.array(numpy.ones((N,), dtype=float)*numpy.nan),
+        'roll_max' : numpy.array(numpy.ones((N,), dtype=float)*numpy.nan),
         }
 
     # sample count
@@ -79,63 +84,62 @@ def parser(platform_info, sensor_info, lines):
         # split line
         sw = re.split(',', line)
         if len(sw)<=0:
-            print ' ... skipping line %d -- %s' % (i,line)
+            print ' ... skipping line %d ' % (i,)
             continue
 
-        # replace "NAN"
+        # replace any "NAN" text with a number
         for index, s in enumerate(sw):
             m = re.search(NAN_RE_STR, s)
             if m:
                 sw[index] = '-99999'
 
         # parse date-time, and all other float and integers
-        for s in sw[1:6]:
+        for s in sw[1:]:
             m = re.search(REAL_RE_STR, s)
             if m:
                 csi.append(float(m.groups()[0]))
 
-        if len(sw)>=8:
-            dstr = re.sub('"', '', sw[6]+' '+sw[7])
-            # print dstr
-            m = re.search('\s*(\d{2})\s*(\w{2,3})\s*(\d{4})\s*(\d{2}):(\d{2}):(\d{2})', dstr)
-        else:
-            print ' ... skipping line %d -- %s ' % (i,line)
-            continue            
-
-        if m:
-            dstr = '%s %s %s %s:%s:%s' % m.groups()
-        else:
-            print ' ... skipping line %d -- %s ' % (i,line)
-            continue            
-
         if  sensor_info['utc_offset']:
-            sample_dt = scanf_datetime(dstr, fmt='%d %b %Y %H:%M:%S') + \
+            sample_dt = scanf_datetime(sw[0], fmt='"%Y-%m-%d %H:%M:%S"') + \
                         timedelta(hours=sensor_info['utc_offset'])
         else:
-            sample_dt = scanf_datetime(dstr, fmt='%d %b %Y %H:%M:%S')
+            sample_dt = scanf_datetime(sw[0], fmt='"%Y-%m-%d %H:%M:%S"')
 
-        # ***** TO DO: need to adjust any drift of offset in CTD sample time to CR1000 clock
         data['dt'][i] = sample_dt # sample datetime
         data['time'][i] = dt2es(sample_dt) # sample time in epoch seconds
-
-        if len(csi)==5:
-            #
-            # (pg 31 SBE IMP Microcat User Manual)
-            # "#iiFORMAT=1 (default) Output converted to data
-            # date format dd mmm yyyy,
-            # conductivity = S/m,
-            # temperature precedes conductivity"
-            sn = csi[1] # ctd serial number == check against platform configuration
-            data['wtemp'][i] =  csi[2] # water temperature (C)
-            data['cond'][i] = csi[3] # specific conductivity (S/m)
-            data['press'][i] = csi[4]   # pressure decibars 
+        
+        if len(csi)==9:
+            # 
+            # data['samplenum'][i] = csi[0] # sample number assigned by datalogger in table
+            data['hdg'][i] =  csi[1] # Honeywell compass Heading avg (deg Mag North) (60 samples for 1 min) 
+            data['hdg_std'][i] = csi[2] # heading std (deg)
+            data['pitch'][i] = csi[3] # 1 min avg of pitch (deg)
+            data['pitch_std'][i] = csi[4] # pitch std (deg )
+            data['pitch_max'][i] = csi[5] # pitch angle max (deg)
+            data['roll'][i] = csi[6] # avg roll (deg) 
+            data['roll_std'][i] = csi[7] # roll std (deg) 
+            data['roll_max'][i] = csi[8] # roll max (deg)
             i=i+1
         else:
             print ' ... skipping line %d -- %s ' % (i,line)
-            continue            
-            
+            continue
+
         # if re.search
     # for line
+
+    # Specific to buoys using CR1000 in Fall of 2011
+    # prior to Jan 01, 2012, nothing different in compass
+    # but can be handled here if there was difference
+    if data['dt'][0] < datetime(2012, 1, 1):
+        pass
+    
+    # some QC
+    # good = -40<at & at<60 # does not work
+    # good = (-40<at) & (at<60) # THIS WORKS!
+    # good = (0<data['hdg']) & (data['hdg']<360)
+    # bad = ~good
+    # data['hdg'][bad] = numpy.nan 
+    # data['hdg_std'][bad] = numpy.nan 
 
     # check that no data[dt] is set to Nan or anything but datetime
     # keep only data that has a resolved datetime
@@ -144,41 +148,15 @@ def parser(platform_info, sensor_info, lines):
         for param in data.keys():
             data[param] = data[param][keep]
 
-    # Quality Control steps for temp, depth, and cond 
-    # (1) within range
-    # (2) if not pumped 
-    # (2) if not pumped
-    good = (-5<data['wtemp']) & (data['wtemp']<30)
-    bad = ~good
-    data['wtemp'][bad] = numpy.nan
-    
-    good = (0<data['cond']) & (data['cond']<7)
-    bad = ~good
-    data['cond'][bad] = numpy.nan
-    
-    # calculate depth, salinity and density    
-    import seawater.csiro
-    import seawater.constants
-
-    # seawater.constants.C3515 is units of mS/cm
-    # data['cond'] is units of S/m
-    # You have: mS cm-1
-    # You want: S m-1
-    #     <S m-1> = <mS cm-1>*0.1
-    #     <S m-1> = <mS cm-1>/10
-
-    data['depth'] = -1*seawater.csiro.depth(data['press'], platform_info['lat']) # meters
-    data['salin'] = seawater.csiro.salt(10*data['cond']/seawater.constants.C3515, data['wtemp'], data['press']) # psu
-    data['density'] = seawater.csiro.dens(data['salin'], data['wtemp'], data['press']) # kg/m^3
-
     return data
+ 
 
 def creator(platform_info, sensor_info, data):
     #
     # 
     # subset data only to month being processed (see raw2proc.process())
     i = data['in']
-    
+
     title_str = sensor_info['description']+' at '+ platform_info['location']
     global_atts = {
         'title' : title_str,
@@ -226,13 +204,13 @@ def creator(platform_info, sensor_info, data):
                   'axis': 'T',
                   },
         'lat' : {'short_name': 'lat',
-             'long_name': 'Latitude',
-             'standard_name': 'latitude',
-             'reference':'geographic coordinates',
-             'units': 'degrees_north',
-             'valid_range':(-90.,90.),
-             'axis': 'Y',
-             },
+                 'long_name': 'Latitude',
+                 'standard_name': 'latitude',
+                 'reference':'geographic coordinates',
+                 'units': 'degrees_north',
+                 'valid_range':(-90.,90.),
+                 'axis': 'Y',
+                 },
         'lon' : {'short_name': 'lon',
                  'long_name': 'Longitude',
                  'standard_name': 'longitude',
@@ -242,49 +220,67 @@ def creator(platform_info, sensor_info, data):
                  'axis': 'Y',
                  },
         'z' : {'short_name': 'z',
-               'long_name': 'Depth',
-               'standard_name': 'depth',
-               'reference':'zero at sea-surface',
+               'long_name': 'Altitude',
+               'standard_name': 'altitude',
+               'reference':'zero at mean sea level',
                'positive' : 'up',
                'units': 'm',
                'axis': 'Z',
                },
         # data variables
-        'wtemp': {'short_name': 'wtemp',
-                  'long_name': 'Water Temperature',
-                  'standard_name': 'water_temperature',                          
-                  'units': 'degrees_Celsius',
+        'hdg': {'short_name': 'hdg',
+                  'long_name': 'Heading',
+                  'standard_name': 'heading',                          
+                  'units': 'degrees',
+                  'reference': 'clockwise from Magnetic North',
+                  'z': sensor_info['compass_height'],
+                  'z_units' : 'meter',
                   },
-        'cond': {'short_name': 'cond',
-                 'long_name': 'Conductivity',
-                 'standard_name': 'conductivity',                          
-                 'units': 'S m-1',
-                 },
-        'press': {'short_name': 'press',
-                 'long_name': 'Pressure',
-                 'standard_name': 'water_pressure',                          
-                 'units': 'decibar',
-                 },
-        'depth': {'short_name': 'depth',
-                  'long_name': 'Depth',
-                  'standard_name': 'depth',                          
-                  'reference':'zero at sea-surface',
-                  'positive' : 'up',
-                  'units': 'm',
-                  'comment': 'Derived using seawater.csiro.depth(press,lat)',
-                 },
-        'salin': {'short_name': 'salin',
-                  'long_name': 'Salinity',
-                  'standard_name': 'salinity',
-                  'units': 'psu',
-                  'comment': 'Derived using seawater.csiro.salt(cond/C3515,wtemp,press)',
-                 },
-        'density': {'short_name': 'density',
-                    'long_name': 'Density',
-                    'standard_name': 'density',
-                    'units': 'kg m-3',
-                    'comment': 'Derived using seawater.csiro.dens0(salin,wtemp,press)',
-                 },
+        'hdg_std': {'short_name': 'hdg_std',
+                  'long_name': 'Standard Deviation of Heading',
+                  'standard_name': 'heading standard_deviation',                          
+                  'units': 'degrees',
+                  'z': sensor_info['compass_height'],
+                  'z_units' : 'meter',
+                  },
+        'pitch': {'short_name': 'pitch',
+                  'long_name': 'Pitch',
+                  'standard_name': 'pitch',                          
+                  'units': 'degrees',
+                  },
+        'pitch_std': {'short_name': 'pitch_std',
+                  'long_name': 'Standard Deviation of Pitch',
+                  'standard_name': 'pitch standard_deviation',                          
+                  'units': 'degrees',
+                  'z': sensor_info['compass_height'],
+                  'z_units' : 'meter',
+                  },
+        'pitch_max': {'short_name': 'pitch_max',
+                  'long_name': 'Maximum of Pitch',
+                  'standard_name': 'pitch maximum',                          
+                  'units': 'degrees',
+                  'z': sensor_info['compass_height'],
+                  'z_units' : 'meter',
+                  },
+        'roll': {'short_name': 'roll',
+                  'long_name': 'Roll',
+                  'standard_name': 'roll',                          
+                  'units': 'degrees',
+                  },
+        'roll_std': {'short_name': 'roll_std',
+                  'long_name': 'Standard Deviation of Roll',
+                  'standard_name': 'roll standard_deviation',                          
+                  'units': 'degrees',
+                  'z': sensor_info['compass_height'],
+                  'z_units' : 'meter',
+                  },
+        'roll_max': {'short_name': 'roll_max',
+                  'long_name': 'Maximum of Roll',
+                  'standard_name': 'roll maximum',                          
+                  'units': 'degrees',
+                  'z': sensor_info['compass_height'],
+                  'z_units' : 'meter',
+                  },
         }
 
     # dimension names use tuple so order of initialization is maintained
@@ -306,37 +302,41 @@ def creator(platform_info, sensor_info, data):
         ('lon', NC.FLOAT, ('nlon',)),
         ('z',  NC.FLOAT, ('nz',)),
         # data variables
-        ('wtemp', NC.FLOAT, ('ntime',)),
-        ('cond', NC.FLOAT, ('ntime',)),
-        ('press', NC.FLOAT, ('ntime',)),
-        # derived variables
-        ('depth', NC.FLOAT, ('ntime',)),
-        ('salin', NC.FLOAT, ('ntime',)),
-        ('density', NC.FLOAT, ('ntime',)),
+        ('hdg', NC.FLOAT, ('ntime',)),
+        ('hdg_std', NC.FLOAT, ('ntime',)),
+        ('pitch', NC.FLOAT, ('ntime',)),
+        ('pitch_std', NC.FLOAT, ('ntime',)),
+        ('pitch_max', NC.FLOAT, ('ntime',)),
+        ('roll', NC.FLOAT, ('ntime',)),
+        ('roll_std', NC.FLOAT, ('ntime',)),
+        ('roll_max', NC.FLOAT, ('ntime',)),
         )
 
+    # subset data only to month being processed (see raw2proc.process())
+    i = data['in']
+    
     # var data 
     var_data = (
         ('lat',  platform_info['lat']),
         ('lon', platform_info['lon']),
-        ('z', sensor_info['nominal_depth']),
+        ('z', platform_info['altitude']),
         #
         ('time', data['time'][i]),
         #
-        ('wtemp', data['wtemp'][i]),
-        ('cond', data['cond'][i]),
-        ('press', data['press'][i]),
-        # derived variables
-        ('depth', data['depth'][i]),
-        ('salin',  data['salin'][i]),
-        ('density', data['density'][i]),
+        ('hdg', data['hdg'][i]),
+        ('hdg_std', data['hdg_std'][i]),
+        ('pitch', data['pitch'][i]),
+        ('pitch_std', data['pitch_std'][i]),
+        ('pitch_max', data['pitch_max'][i]),
+        ('roll', data['roll'][i]),
+        ('roll_std', data['roll_std'][i]),
+        ('roll_max', data['roll_max'][i]),
         )
 
     return (global_atts, var_atts, dim_inits, var_inits, var_data)
 
 def updater(platform_info, sensor_info, data):
     #
-
     # subset data only to month being processed (see raw2proc.process())
     i = data['in']
 
@@ -364,13 +364,15 @@ def updater(platform_info, sensor_info, data):
     # data 
     var_data = (
         ('time', data['time'][i]),
-        ('wtemp', data['wtemp'][i]),
-        ('cond', data['cond'][i]),
-        ('press', data['press'][i]),
-        # derived variables
-        ('depth', data['depth'][i]),
-        ('salin',  data['salin'][i]),
-        ('density', data['density'][i]),
+        #
+        ('hdg', data['hdg'][i]),
+        ('hdg_std', data['hdg_std'][i]),
+        ('pitch', data['pitch'][i]),
+        ('pitch_std', data['pitch_std'][i]),
+        ('pitch_max', data['pitch_max'][i]),
+        ('roll', data['roll'][i]),
+        ('roll_std', data['roll_std'][i]),
+        ('roll_max', data['roll_max'][i]),
         )
 
     return (global_atts, var_atts, var_data)

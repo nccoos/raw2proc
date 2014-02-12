@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Last modified:  Time-stamp: <2012-06-28 14:47:42 haines>
+# Last modified:  Time-stamp: <2014-01-09 12:49:27 haines>
 """
 how to parse data, and assert what data and info goes into
 creating and updating monthly netcdf files
@@ -141,11 +141,11 @@ def parser(platform_info, sensor_info, lines):
     # Quality Control steps for temp, depth, and cond 
     # (1) within range
     # (2) if not pumped 
-    good = (5<data['wtemp']) & (data['wtemp']<30)
+    good = (-5<data['wtemp']) & (data['wtemp']<30)
     bad = ~good
     data['wtemp'][bad] = numpy.nan
     
-    good = (2<data['cond']) & (data['cond']<7)
+    good = (0<data['cond']) & (data['cond']<7)
     bad = ~good
     data['cond'][bad] = numpy.nan
     

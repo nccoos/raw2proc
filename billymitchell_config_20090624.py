@@ -1,15 +1,12 @@
-#
-# Increase number of altitudes to 59 (from 10 - 300 meters)
-#
 platform_info = {
     'id' : 'billymitchell',
     'location' : 'Billy Mitchell Airfield, Frisco, NC',
     'lat' : 35.231691,  # degrees true (-) south, (+) north
     'lon' : -75.622614, # degrees true (-) west, (+) east
-    'mvar' : -10.783333,      # degrees (-) west, (+) east
+    'mvar' : -10.683333,      # degrees (-) west, (+) east
     'institution' : 'nccoos',
-    'config_start_date' : '2011-06-07 20:00:00',
-    'config_end_date' : '2011-08-25 14:30:00', # None or yyyy-mm-dd HH:MM:SS
+    'config_start_date' : '2009-06-24 14:00:00',
+    'config_end_date' : '2010-09-01 10:00:00', # None or yyyy-mm-dd HH:MM:SS
     'packages' : ('sfas',),
     }
 sensor_info = {
@@ -22,7 +19,7 @@ sensor_info = {
                'utc_offset' : 0,         # hours offset to utc
                'min_altitude' : 10,      # meters
                'altitude_interval' : 5,  # meters
-               'num_altitudes' : 59,
+               'num_altitudes' : 39,
                'sensor_elevation' : 0,   # meters (runway elev is at 5.2 m)
                'plot_module' : 'billymitchell_sodar_plot', 
                'plot_names' : ('timeseries', 'wind_vectors', 'wind_barbs'), 

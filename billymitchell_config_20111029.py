@@ -1,3 +1,6 @@
+#
+# Decrease number of altitudes to 37 (from 15 - 195 meters)
+#
 platform_info = {
     'id' : 'billymitchell',
     'location' : 'Billy Mitchell Airfield, Frisco, NC',
@@ -6,17 +9,15 @@ platform_info = {
     'mvar' : -10.783333,      # degrees (-) west, (+) east
     'institution' : 'nccoos',
     'config_start_date' : '2011-10-29 00:30:00',
-    'config_end_date' : '2012-04-16 19:00:00', # None or yyyy-mm-dd HH:MM:SS
+    'config_end_date' : '2012-04-16 18:30:00', # None or yyyy-mm-dd HH:MM:SS
     'packages' : ('sfas',),
     }
 sensor_info = {
     'sfas' : { 'id' : 'sodar',
                'description' : 'Wind profile data',
-               'raw_dir' : '/seacoos/data/nccoos/level0/'
-                           'billymitchell/sodar1/mnd',
+               'raw_dir' : '/seacoos/data/nccoos/level0/billymitchell/sodar1/mnd',                                       
                'raw_file_glob' : '*.mnd',
-               'proc_dir' : '/seacoos/data/nccoos/level1/'
-                            'billymitchell/sodar1',
+               'proc_dir' : '/seacoos/data/nccoos/level1/billymitchell/sodar1',                                    
                'process_module' : 'proc_scintec_maindata_sfas',
                'utc_offset' : 0,         # hours offset to utc
                'min_altitude' : 15,      # meters

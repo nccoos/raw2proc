@@ -30,6 +30,19 @@ platform_info = {
             'metadata_url' : 'http://nccoos.org',
             'references' : 'http://nccoos.org',
             'source': 'Buoy CR1000 Datalogger',
+            # Needed for processing NDBC output
+            'ndbc_module' : 'ndbc_41xxx',
+            'ndbc_id': '41xxx',
+            'ndbc_dir' : '/seacoos/data/nccoos/latest_ndbc',
+            'ndbc_missing' : -9999.0,
+            # report data to NDBC closest to top of each hour +/- 6 min
+            'ndbc_sample_interval':(1,'hour'),
+            'ndbc_sample_offset':(0,'minute'),
+            'ndbc_time_tolerance':(6,'minute'),
+            # report data closest to 0:10 and 0:40 each hour +/- 3 min
+            # 'ndbc_sample_interval':(30,'minute'), # every 30 min
+            # 'ndbc_sample_offset':(10,'minute'), # offset by +10 min
+            # 'ndbc_time_tolerance':(3,'minute'),
  	    }
 
 sensor_info = {
@@ -47,6 +60,9 @@ sensor_info = {
               'source': 'Heise Baro, Rotronics Temp/RH, RM Young Precip, Eppley PSP/PIR',
               # 'latest_dir' : '/seacoos/data/nccoos/latest_v2.0',
               # 'latest_vars' : ('time','lat','lon','z','atemp', 'baro', 'rh', 'rain', 'psp', 'pir'),
+              'ndbc_vars' : ('air_temp', 'air_press', 'rh', 'psp', 'pir'),
+              'ndbc_tags' : ('atmp1', 'baro1', 'rrh', 'srad1', 'lwrad'),
+              'ndbc_units' : ('degC', 'hPa', '%', 'W m-2', 'W m-2'),
               'plot_module': 'plot_cr1000_met',
               'plot_names': ('timeseries',),
              },
@@ -65,6 +81,9 @@ sensor_info = {
               'source': 'RM Young Marine Wind Monitor 5106',
               # 'latest_dir' : '/seacoos/data/nccoos/latest_v2.0',
               # 'latest_vars' : ('time','lat','lon','z','u', 'v', 'wspd', 'wdir'),
+              'ndbc_vars' : ('wspd1', 'wdir1', 'wgust1', 'wspd2', 'wdir2', 'wgust2'),
+              'ndbc_tags' : ('wspd1', 'wdir1', 'gust1', 'wspd2', 'wdir2', 'gust2'),
+              'ndbc_units' : ('m s-1', 'degrees', 'm s-1', 'm s-1', 'degrees', 'm s-1'),
               'plot_module': 'plot_cr1000_wind',
               'plot_names': ('timeseries',),
              },
@@ -82,6 +101,10 @@ sensor_info = {
               'source': 'Seabird (SBE) 37 IMP',
               # 'latest_dir' : '/seacoos/data/nccoos/latest_v2.0',
               # 'latest_vars' : ('time','lat','lon','z','depth', 'wtemp', 'cond', 'salin', 'density'),
+              'ndbc_vars' : ('wtemp','depth', 'wtemp', 'salin'),
+              # wtmp1 tag needed to get into weather obs, others for temp/salin obs
+              'ndbc_tags' : ('wtmp1', 'dp001', 'tp001', 'sp001'), 
+              'ndbc_units' : ('degC', 'm', 'degC', 'psu'), 
               'plot_module': 'plot_cr1000_ctd',
               'plot_names': ('timeseries',),
              },
@@ -99,6 +122,9 @@ sensor_info = {
               'source': 'Seabird (SBE) 37 IMP',
               # 'latest_dir' : '/seacoos/data/nccoos/latest_v2.0',
               # 'latest_vars' : ('time','lat','lon','z','depth', 'wtemp', 'cond', 'salin', 'density'),
+              'ndbc_vars' : ('depth', 'wtemp', 'salin'),
+              'ndbc_tags' : ('dp002', 'tp002', 'sp002'),
+              'ndbc_units' : ('m', 'degC', 'psu'), 
               'plot_module': 'plot_cr1000_ctd',
               'plot_names': ('timeseries',),
              },
