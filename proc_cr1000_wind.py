@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Last modified:  Time-stamp: <2012-06-27 09:00:17 haines>
+# Last modified:  Time-stamp: <2014-02-17 13:37:43 haines>
 """
 how to parse data, and assert what data and info goes into
 creating and updating monthly netcdf files
@@ -137,6 +137,10 @@ def parser(platform_info, sensor_info, lines):
     data['wdir1'][bad] = numpy.nan
     bad = data['wdir2']==0    # print ' ... ... Number of zero wdir1 = %d' % numpy.sum(bad)
     data['wdir2'][bad] = numpy.nan
+
+    # adjust wind dir in magnetic North to True North by using the station mvar
+    data['wdir1'] = numpy.mod(data['wdir1'] + platform_info['mvar'] + 360., 360.)
+    data['wdir2'] = numpy.mod(data['wdir2'] + platform_info['mvar'] + 360., 360.)
                                    
     # check that no data[dt] is set to Nan or anything but datetime
     # keep only data that has a resolved datetime
@@ -237,7 +241,7 @@ def creator(platform_info, sensor_info, data):
         'wdir1' : {'short_name': 'wdir',
                   'long_name': 'Wind Direction from',
                   'standard_name': 'wind_from_direction',
-                  'reference': 'clockwise from Magnetic North',
+                  'reference': 'clockwise from True North',
                   'valid_range': (0., 360),
                   'units': 'degrees',
                   'z' : sensor_info['anemometer1_height'],
@@ -271,7 +275,7 @@ def creator(platform_info, sensor_info, data):
         'wdir2' : {'short_name': 'wdir',
                   'long_name': 'Wind Direction from',
                   'standard_name': 'wind_from_direction',
-                  'reference': 'clockwise from Magnetic North',
+                  'reference': 'clockwise from True North',
                   'valid_range': (0., 360),
                   'units': 'degrees',
                   'z' : sensor_info['anemometer2_height'],
