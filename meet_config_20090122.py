@@ -12,7 +12,7 @@ platform_info = {
     'institution' : 'nccoos',
     # 
     'config_start_date' : '2009-01-01 00:00:00',
-    'config_end_date' : None, # None or yyyy-mm-dd HH:MM:SS
+    'config_end_date' : '2012-06-01', # None or yyyy-mm-dd HH:MM:SS
     'packages' : ('flow', 'wq'),
     }
 sensor_info = {

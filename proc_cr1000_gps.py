@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Last modified:  Time-stamp: <2014-02-05 17:47:20 haines>
+# Last modified:  Time-stamp: <2014-04-30 11:52:37 haines>
 """
 how to parse data, and assert what data and info goes into
 creating and updating monthly netcdf files
@@ -138,12 +138,16 @@ def parser(platform_info, sensor_info, lines):
             # quality of fix
 
             if sw[4] != 'A':
-                data['qps_active'][i] = 0
+                data['gps_active'][i] = 0
                 print '... Invalid GPS Fix -- skipping line %d' % (i,) 
                 continue
 
-            gps_dt_str = sw[11] + ' ' + sw[3] # ddmmyy HHMMSS
+            gps_dt_str = sw[11] + ' ' + sw[3] # ddmmyy HHMMSS or ddmmyy HHMMSS.f
             gps_dt = scanf_datetime(gps_dt_str, fmt='%d%m%y %H%M%S')
+            if gps_dt == None:
+                gps_dt = scanf_datetime(gps_dt_str, fmt='%d%m%y %H%M%S.%f')
+                           
+            gps_dt.replace(microsecond=0)
             data['gps_dt'][i] = gps_dt # gps fix datetime object    
             data['gps_time'][i] = dt2es(gps_dt) # gps fix time (epoch secs)
 

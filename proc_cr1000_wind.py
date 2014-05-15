@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Last modified:  Time-stamp: <2014-02-17 13:37:43 haines>
+# Last modified:  Time-stamp: <2014-04-30 17:52:11 haines>
 """
 how to parse data, and assert what data and info goes into
 creating and updating monthly netcdf files
@@ -117,12 +117,12 @@ def parser(platform_info, sensor_info, lines):
             # data['samplenum'][i] = csi[0] # sample number assigned by datalogger in table
             data['wspd1'][i] = csi[1] # 
             data['wdir1'][i] = csi[2] # 
-            data['wgust1'][i] = csi[3] # relative humidity std
-            data['wspd1_std'][i] = csi[4] # air temperature avg (deg C)
-            data['wspd2'][i] = csi[5] # air temperature std (deg C)
-            data['wdir2'][i] = csi[6] # precip gauge cummulative 
-            data['wgust2'][i] = csi[7] # PSP avg 
-            data['wspd2_std'][i] = csi[8] # PSP std
+            data['wgust1'][i] = csi[3] # 
+            data['wspd1_std'][i] = csi[4] # 
+            data['wspd2'][i] = csi[5] # 
+            data['wdir2'][i] = csi[6] # 
+            data['wgust2'][i] = csi[7] # 
+            data['wspd2_std'][i] = csi[8] # 
             i=i+1
         else:
             print ' ... skipping line %d -- %s ' % (i,line)
@@ -137,6 +137,16 @@ def parser(platform_info, sensor_info, lines):
     data['wdir1'][bad] = numpy.nan
     bad = data['wdir2']==0    # print ' ... ... Number of zero wdir1 = %d' % numpy.sum(bad)
     data['wdir2'][bad] = numpy.nan
+
+    # apply any known data offsets (correction) as provided in config file
+    # use the config file, so we don't have to have lots of conditional statements
+    # for which platform and date ranges.  Let the configs take care of that.
+    if 'offset_vars' in sensor_info.keys():
+        vns = sensor_info['offset_vars']
+        offset = sensor_info['offset_vals']
+        for iv, vn in enumerate(vns):
+            print ' ... applying %g offset to %s ' % (offset[iv], vn)
+            data[vn] = data[vn] + offset[iv]
 
     # adjust wind dir in magnetic North to True North by using the station mvar
     data['wdir1'] = numpy.mod(data['wdir1'] + platform_info['mvar'] + 360., 360.)

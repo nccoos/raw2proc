@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Last modified:  Time-stamp: <2012-05-15 10:51:49 haines>
+# Last modified:  Time-stamp: <2014-03-03 15:37:07 haines>
 """Utilities to help data processing 
 
    Mostly time functions right now
@@ -415,9 +415,11 @@ def addnan(dt, data, maxdelta=None):
     dn = date2num(dt)
     delta = numpy.diff(dn)
     sample_interval = numpy.median(delta)
+    if sample_interval == 0:
+        sample_interval = 60./(60*24)
     if maxdelta==None:
         maxdelta = 2.*sample_interval
-    # print maxdelta
+    # print 'procutil.addnan: sample_interval = %g, maxdelta = %g' % (sample_interval, maxdelta)
     igap = (delta > maxdelta).nonzero()[0]
     ngap = len(igap)
     if not ngap:

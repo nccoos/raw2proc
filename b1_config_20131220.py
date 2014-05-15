@@ -6,7 +6,7 @@ platform_info = {
  	    # 'mvar' : -11.3,    # degrees (-) west, (+) east
  	    'location' : 'Testing at IMS, Morehead City, NC',
  	    'lat' : 34.7232,   # degrees true (-) south, (+) north
- 	    'lon' : -75.7528,  # degrees true (-) west, (+) east
+ 	    'lon' : -76.7528,  # degrees true (-) west, (+) east
  	    'mvar' : -10.0,    # degrees (-) west, (+) east
             'altitude': 0.,   # (approx.) station altitude
             'altitude_units' : 'm',
@@ -17,7 +17,7 @@ platform_info = {
  	    'institution' : 'nccoos',
  	    #
  	    'config_start_date' : '2013-12-20 00:00:00',
- 	    'config_end_date' : None, # None or yyyy-mm-dd HH:MM:SS
+ 	    'config_end_date' : '2014-04-30 23:59:00', # None or yyyy-mm-dd HH:MM:SS
  	    'packages' : ('met', 'wind', 'ctd1', 'ctd2', 'comp', 'sys', 'gps'),
             # Required by CF
             'institution' : 'Unversity of North Carolina at Chapel Hill (UNC-CH)',
@@ -106,6 +106,7 @@ sensor_info = {
               # 'latest_dir' : '/seacoos/data/nccoos/latest_v2.0',
               # 'latest_vars' : ('time','lat','lon','z','depth', 'wtemp', 'cond', 'salin', 'density'),
               'ndbc_vars' : ('wtemp','depth', 'wtemp', 'salin'),
+              # wtemp recorded in two fields for ndbc
               # wtmp1 tag needed to get into weather obs, others for temp/salin obs
               'ndbc_tags' : ('wtmp1', 'dp001', 'tp001', 'sp001'), 
               'ndbc_units' : ('degC', 'm', 'degC', 'psu'), 
@@ -143,8 +144,8 @@ sensor_info = {
               'height_units' : 'm',
               'height_reference' : 'sea_surface',
               'source': 'Honeywell Digital Compass',
-              # 'plot_module': 'plot_cr1000_comp',
-              # 'plot_names': ('timeseries',),
+              'plot_module': 'plot_cr1000_comp',
+              'plot_names': ('timeseries',),
              },
     'sys' : { 'id' : 'sys',
               'description' : 'CR1000 System Data',
@@ -157,8 +158,8 @@ sensor_info = {
               'height_units' : 'm',
               'height_reference' : 'sea_surface',
               'source': 'CR1000 batt, canister temp, and leak detect',
-              # 'plot_module': 'plot_cr1000_sys',
-              # 'plot_names': ('timeseries',),
+              'plot_module': 'plot_cr1000_sys',
+              'plot_names': ('timeseries',),
              },
     'gps' : { 'id' : 'gps',
               'description' : 'CR1000 GPS Data',
@@ -168,7 +169,7 @@ sensor_info = {
               'process_module' : 'proc_cr1000_gps',
               'utc_offset' : 0,  # hours offset to utc of sampling time
               'source': 'Garmin HVS 19x GPS ',
-              # 'plot_module': 'plot_cr1000_gps',
-              # 'plot_names': ('timeseries',),
+              'plot_module': 'plot_cr1000_gps',
+              'plot_names': ('watch_circle',),
              },
     }
