@@ -13,8 +13,8 @@ platform_info = {
  	    'institution' : 'nccoos',
  	    #
  	    'config_start_date' : '2014-04-28 13:00:00',
- 	    'config_end_date' : None, # None or yyyy-mm-dd HH:MM:SS
- 	    'packages' : ('met', 'wind', 'ctd1', 'ctd2', 'comp', 'gps', 'sys'),
+ 	    'config_end_date' : '2015-01-29 00:00:00', # None or yyyy-mm-dd HH:MM:SS
+ 	    'packages' : ('met', 'wind', 'ctd1', 'ctd2', 'ctd3', 'comp', 'gps', 'sys', 'adcp', 'adcpwaves'),
             # Required by CF
             'institution' : 'Unversity of North Carolina at Chapel Hill (UNC-CH)',
             'institution_url' : 'http://nccoos.org',
@@ -93,10 +93,11 @@ sensor_info = {
              },
     'ctd1' : { 'id' : 'ctd1',
               'description' : 'Near-surface CTD Data each sample period',
-              'raw_dir' : '/seacoos/data/nccoos/level0/b2/ctd1/',
+               # use internally recorded data
+              'raw_dir' : '/seacoos/data/nccoos/level0/b2/ctd1/store/2014_04/',
               'raw_file_glob' : '*',
               'proc_dir' : '/seacoos/data/nccoos/level1/b2/ctd1/',
-              'process_module' : 'proc_cr1000_ctd_v1',
+              'process_module' : 'proc_sbe37_ctd',
               'utc_offset' : 0,  # hours offset to utc of sampling time
               'nominal_depth' : -2.0,  # meters 
               'depth_units' : 'm',
@@ -114,10 +115,11 @@ sensor_info = {
              },
     'ctd2' : { 'id' : 'ctd2',
                'description' : 'Mid-level CTD Data each sample period',
-              'raw_dir' : '/seacoos/data/nccoos/level0/b2/ctd2/',
+               # use internally recorded data 
+              'raw_dir' : '/seacoos/data/nccoos/level0/b2/ctd2/store/2014_04/',
               'raw_file_glob' : '*',
               'proc_dir' : '/seacoos/data/nccoos/level1/b2/ctd2/',
-              'process_module' : 'proc_cr1000_ctd_v1',
+              'process_module' : 'proc_sbe37_ctd',
               'utc_offset' : 0,  # hours offset to utc of sampling time
               'nominal_depth' : -15.0,  # meters 
               'depth_units' : 'm',
@@ -171,4 +173,52 @@ sensor_info = {
               'plot_module': 'plot_cr1000_gps',
               'plot_names': ('watch_circle',),
              },
+    'ctd3' : { 'id' : 'ctd3',
+              'description' : 'Near-surface CTD Data each sample period',
+               # use internally recorded data
+              'raw_dir' : '/seacoos/data/nccoos/level0/b2/ctd3/store/2014_05/',
+              'raw_file_glob' : '*',
+              'proc_dir' : '/seacoos/data/nccoos/level1/b2/ctd3/',
+              'process_module' : 'proc_sbe37_ctd',
+              'utc_offset' : 0,  # hours offset to utc of sampling time
+              'nominal_depth' : -100.0,  # meters 
+              'depth_units' : 'm',
+              'depth_reference' : 'sea_surface',
+              # Recommended
+              'source': 'Seabird (SBE) 37 IMP',
+              # 'latest_dir' : '/seacoos/data/nccoos/latest_v2.0',
+              # 'latest_vars' : ('time','lat','lon','z','depth', 'wtemp', 'cond', 'salin', 'density'),
+              # 'ndbc_vars' : ('wtemp','depth', 'wtemp', 'salin'),
+              # wtmp1 tag needed to get into weather obs, others for temp/salin obs
+              # 'ndbc_tags' : ('wtmp1', 'dp001', 'tp001', 'sp001'), 
+              # 'ndbc_units' : ('degC', 'm', 'degC', 'psu'), 
+              'plot_module': 'plot_cr1000_ctd',
+              'plot_names': ('timeseries',),
+             },
+    'adcp' : { 'id' : 'adcp',
+               'description' : 'RDI Current profile data',
+               'raw_dir' : '/seacoos/data/nccoos/level0/b2/adcp_wh_cLogData/store/2014_04',
+               'raw_file_glob' : '*',
+               'proc_dir' : '/seacoos/data/nccoos/level1/b2/adcp',
+               'process_module' : 'proc_rdi_logdata_adcp',
+               'utc_offset' : 0,      # hours offset to utc
+               'nbins' : 35,
+               'bin_size' : 1.0,      # meters
+               'transducer_ht' : 0.75, # meters above the bottom
+               'blanking_ht' : 1.5,   # meters above transducer
+               # 'latest_dir' : '/seacoos/data/nccoos/latest_v2.0',
+               # 'latest_vars' : ('time','lat','lon','z','u','v'),
+               },
+    'adcpwaves' : {'id' : 'adcpwaves',
+                   'description' : 'Directional wave data',
+                   'raw_dir' : '/seacoos/data/nccoos/level0/b2/adcp_wh_cSpecData',
+                   'raw_file_glob' : 'DSpec*',
+                   'proc_dir' : '/seacoos/data/nccoos/level1/b2/adcpwaves',
+                   'process_module' : 'proc_rdi_dspec_dw',
+                   'utc_offset' : 0,  # hours offset to utc
+                   'ndir' : 90.,
+                   'nfreq' : 64.,
+                   # 'latest_dir' : '/seacoos/data/nccoos/latest_v2.0',
+                   # 'latest_vars' : ('time','lat','lon','z','Tp','Hs'),
+                   },
     }

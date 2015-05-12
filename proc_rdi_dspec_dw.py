@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Last modified:  Time-stamp: <2010-12-09 16:13:21 haines>
+# Last modified:  Time-stamp: <2015-04-06 14:15:48 haines>
 """
 how to parse data, and assert what data and info goes into
 creating and updating monthly netcdf files
@@ -235,21 +235,21 @@ def parser(platform_info, sensor_info, lines):
     # for all freq, wind and swell bands as adapted from GV's code
     # (polar_waves_cur_rdi.m, version 8)
     pi = numpy.pi
-    ac = numpy.cos(D*pi/180)
-    as = numpy.sin(D*pi/180)
+    ac1 = numpy.cos(D*pi/180)
+    as1 = numpy.sin(D*pi/180)
 
-    ch0 = (ac*Stheta*Dtheta).sum()
-    sh0 = (as*Stheta*Dtheta).sum()
+    ch0 = (ac1*Stheta*Dtheta).sum()
+    sh0 = (as1*Stheta*Dtheta).sum()
     Dm = numpy.arctan2(sh0,ch0)*180/pi
     if Dm<0: Dm = Dm+360. 
 
-    ch0s = (ac*Stheta_s*Dtheta).sum()
-    sh0s = (as*Stheta_s*Dtheta).sum()
+    ch0s = (ac1*Stheta_s*Dtheta).sum()
+    sh0s = (as1*Stheta_s*Dtheta).sum()
     Dms = numpy.arctan2(sh0s,ch0s)*180/pi
     if Dms<0: Dms = Dms+360.
 
-    ch0w = (ac*Stheta_w*Dtheta).sum()
-    sh0w = (as*Stheta_w*Dtheta).sum()
+    ch0w = (ac1*Stheta_w*Dtheta).sum()
+    sh0w = (as1*Stheta_w*Dtheta).sum()
     Dmw = numpy.arctan2(sh0w,ch0w)*180/pi
     if Dmw<0: Dmw = Dmw+360.
 
@@ -265,6 +265,7 @@ def parser(platform_info, sensor_info, lines):
     # This wave parameter added by SH (not in GV's matlab script)
     imax = Sf[iall]==Sf[iall].max()
     idir = numpy.squeeze(Sxx[imax,:]==Sxx[imax,:].max())
+    # print idir.shape
     Dp = D[idir][0]
     
     imax = Sf[iswell]==Sf[iswell].max()

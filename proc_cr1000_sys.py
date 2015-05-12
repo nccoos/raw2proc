@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Last modified:  Time-stamp: <2014-02-06 06:44:22 haines>
+# Last modified:  Time-stamp: <2014-08-27 16:58:17 haines>
 """
 how to parse data, and assert what data and info goes into
 creating and updating monthly netcdf files
@@ -101,6 +101,7 @@ def parser(platform_info, sensor_info, lines):
         else:
             sample_dt = scanf_datetime(sw[0], fmt='"%Y-%m-%d %H:%M:%S"')
 
+
         data['dt'][i] = sample_dt # sample datetime
         data['time'][i] = dt2es(sample_dt) # sample time in epoch seconds
         
@@ -127,6 +128,11 @@ def parser(platform_info, sensor_info, lines):
     # some QC
     # good = -40<at & at<60 # does not work
     # good = (-40<at) & (at<60) # THIS WORKS!
+
+    # return the -99999 back into Nan's
+    for vn in ['batt_min', 'batt_max', 'can_temp', 'can_rh']:
+        bad = data[vn]==-99999
+        data[vn][bad] = numpy.nan 
 
     # check that no data[dt] is set to Nan or anything but datetime
     # keep only data that has a resolved datetime

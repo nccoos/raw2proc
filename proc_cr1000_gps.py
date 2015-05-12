@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Last modified:  Time-stamp: <2014-04-30 11:52:37 haines>
+# Last modified:  Time-stamp: <2014-08-27 17:22:15 haines>
 """
 how to parse data, and assert what data and info goes into
 creating and updating monthly netcdf files
@@ -187,6 +187,15 @@ def parser(platform_info, sensor_info, lines):
         # if re.search
     # for line
 
+    # return the -99999 back into Nan's
+    # for vn in ['gps_lat', 'gps_lon', 'gps_mvar', 'gps_cog', 'gps_sog']:
+    #     bad = data[vn]==-99999
+    #     data[vn][bad] = numpy.nan 
+
+    # or if GPS has no fix and resets to (0,0) coordinates
+    for vn in ['gps_lat', 'gps_lon']:
+        bad = data[vn]==0
+        data[vn][bad] = numpy.nan 
 
     # check that no data[dt] is set to Nan or anything but datetime
     # keep only data that has a resolved datetime

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Last modified:  Time-stamp: <2014-04-30 17:52:11 haines>
+# Last modified:  Time-stamp: <2014-08-27 17:04:55 haines>
 """
 how to parse data, and assert what data and info goes into
 creating and updating monthly netcdf files
@@ -137,6 +137,12 @@ def parser(platform_info, sensor_info, lines):
     data['wdir1'][bad] = numpy.nan
     bad = data['wdir2']==0    # print ' ... ... Number of zero wdir1 = %d' % numpy.sum(bad)
     data['wdir2'][bad] = numpy.nan
+
+    # return the -99999 back into Nan's
+    for vn in ['wspd1', 'wspd1_std', 'wgust1', 'wdir1', 'wspd2', 'wspd2_std', 'wgust2', 'wdir2']:
+        bad = data[vn]==-99999
+        data[vn][bad] = numpy.nan 
+
 
     # apply any known data offsets (correction) as provided in config file
     # use the config file, so we don't have to have lots of conditional statements

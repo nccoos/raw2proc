@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Last modified:  Time-stamp: <2014-02-04 13:48:19 haines>
+# Last modified:  Time-stamp: <2014-08-27 16:57:47 haines>
 """
 how to parse data, and assert what data and info goes into
 creating and updating monthly netcdf files
@@ -154,16 +154,32 @@ def parser(platform_info, sensor_info, lines):
     bad = ~good
     data['air_temp'][bad] = numpy.nan 
     data['air_temp_std'][bad] = numpy.nan 
-    data['rh'][bad] = numpy.nan 
-    data['rh_std'][bad] = numpy.nan 
-    data['rain'][bad] = numpy.nan 
 
-    good = (-10<data['rh']) & (data['rh']<120)
-    bad = ~good
-    data['rh'][bad] = numpy.nan 
-    data['rh_std'][bad] = numpy.nan 
+    # good = (-10<data['rain']) & (data['rain']<60)
+    # bad = ~good
+    # data['rain'][bad] = numpy.nan 
 
-    # check that no data[dt] is set to Nan or anything but datetime
+    # good = (-10<data['rh']) & (data['rh']<120)
+    # bad = ~good
+    # data['rh'][bad] = numpy.nan 
+    # data['rh_std'][bad] = numpy.nan
+
+    # good = (-10<data['psp']) & (data['psp']<1200)
+    # bad = ~good
+    # data['psp'][bad] = numpy.nan 
+    # data['psp_std'][bad] = numpy.nan
+    
+    # good = (-10<data['pir']) & (data['pir']<1200)
+    # bad = ~good
+    # data['pir'][bad] = numpy.nan 
+    # data['pir_std'][bad] = numpy.nan
+
+    # return the -99999 back into Nan's
+    for vn in ['air_temp', 'air_temp_std', 'rain', 'rh', 'rh_std', 'psp', 'psp_std', 'pir', 'pir_std']:
+        bad = data[vn]==-99999
+        data[vn][bad] = numpy.nan 
+
+    # check that each value in data['dt'] is type datetime, 
     # keep only data that has a resolved datetime
     keep = numpy.array([type(datetime(1970,1,1)) == type(dt) for dt in data['dt'][:]])
     if keep.any():
