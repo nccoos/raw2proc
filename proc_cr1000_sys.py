@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Last modified:  Time-stamp: <2014-08-27 16:58:17 haines>
+# Last modified:  Time-stamp: <2017-03-11 13:09:58 haines>
 """
 how to parse data, and assert what data and info goes into
 creating and updating monthly netcdf files
@@ -49,7 +49,17 @@ def parser(platform_info, sensor_info, lines):
     "2014-02-01 03:00:00",78,12.95,"2014-02-01 02:01:00",13.04,"2014-02-01 02:04:00",6.323,9.01
     "2014-02-01 04:00:00",79,12.99,"2014-02-01 03:50:00",13.03,"2014-02-01 03:13:00",5.068,9.27
 
-    """
+    ####### TO DO add parsing additional variables ######
+    ####### New additions to cr1000_sys -- 4 columns at end #####
+    "TOA5","CR1000_B1_RUDICS","CR1000","55356","CR1000.Std.25","CPU:UNC CHill_30_Buoy1_Revision_2017-02-21.CR1","14173","Sys_1Hr"
+    "TIMESTAMP","RECORD","P_Batt_Min","P_Batt_TMn","P_Batt_Max","P_Batt_TMx","P_Temp_Avg","P_RH_Avg","Li_Batt","WatchdogErrors","SkippedScan","SkippedSystemScan"
+    "TS","RN","","","","","","","","","",""
+    "","","Min","TMn","Max","TMx","Avg","Avg","Smp","Smp","Smp","Smp"
+    "2017-03-01 00:00:00",7,12.38,"2017-02-28 23:52:00",13.16,"2017-02-28 23:01:00",25.22,6.293,3.515,0,7,0
+    "2017-03-01 01:00:00",8,12.44,"2017-03-01 00:09:00",12.66,"2017-03-01 00:50:00",23.72,6.485,3.513,0,7,0
+    "2017-03-01 02:00:00",9,12.65,"2017-03-01 01:04:00",12.69,"2017-03-01 01:09:00",22.72,6.611,3.512,0,7,0
+    "2017-03-01 03:00:00",10,12.67,"2017-03-01 02:36:00",12.71,"2017-03-01 02:03:00",22.23,6.689,3.512,0,7,0
+"""
 
     import numpy
     from datetime import datetime
@@ -104,8 +114,9 @@ def parser(platform_info, sensor_info, lines):
 
         data['dt'][i] = sample_dt # sample datetime
         data['time'][i] = dt2es(sample_dt) # sample time in epoch seconds
-        
-        if len(csi)==7:
+
+        # increased number of parameters so account for both sizes -- was len(csi)==7
+        if len(csi)>=7 and len(csi)<=11:
             # 
             # data['samplenum'][i] = csi[0] # sample number assigned by datalogger in table
             data['batt_min'][i] =  csi[1] # (v) CR1000 batt min in last hour
